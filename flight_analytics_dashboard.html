@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flight Pricing Analytics Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .dashboard {
+            max-width: 1800px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 20px;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+        }
+        
+        .header {
+            grid-column: 1 / -1;
+            text-align: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin-bottom: 10px;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .kpi-grid {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .kpi-card {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .kpi-card h3 {
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .kpi-card .value {
+            font-size: 2rem;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 400px;
+        }
+        
+        .large-chart {
+            grid-column: span 8;
+        }
+        
+        .medium-chart {
+            grid-column: span 6;
+        }
+        
+        .small-chart {
+            grid-column: span 4;
+        }
+        
+        .card h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            border-bottom: 2px solid #e3f2fd;
+            padding-bottom: 10px;
+        }
+        
+        .holiday-comparison {
+            grid-column: span 12;
+            height: 500px;
+        }
+        
+        .route-analysis {
+            grid-column: span 8;
+        }
+        
+        .pricing-segments {
+            grid-column: span 4;
+        }
+        
+        .demand-correlation {
+            grid-column: span 6;
+        }
+        
+        .distance-efficiency {
+            grid-column: span 6;
+        }
+        
+        .recommendations {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            border-left: 5px solid #667eea;
+        }
+        
+        .recommendations h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        .rec-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+        }
+        
+        .rec-item {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .rec-item h3 {
+            color: #667eea;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+        
+        .rec-item p {
+            color: #555;
+            line-height: 1.5;
+        }
+        
+        .highlight {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-weight: bold;
+            color: #d63031;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Header -->
+        <div class="card header">
+            <h1>✈️ Flight Pricing Analytics Dashboard</h1>
+            <p>Comprehensive Market Analysis & Strategic Insights</p>
+        </div>
+        
+        <!-- KPI Cards -->
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <h3>Total Routes</h3>
+                <div class="value">235</div>
+            </div>
+            <div class="kpi-card">
+                <h3>Total Flights</h3>
+                <div class="value">82.1M</div>
+            </div>
+            <div class="kpi-card">
+                <h3>Avg Market Price</h3>
+                <div class="value">$340</div>
+            </div>
+            <div class="kpi-card">
+                <h3>Market Demand</h3>
+                <div class="value">4.02/10</div>
+            </div>
+            <div class="kpi-card">
+                <h3>Price Volatility</h3>
+                <div class="value">56.8%</div>
+            </div>
+        </div>
+        
+        <!-- Holiday Comparison Chart -->
+        <div class="card holiday-comparison">
+            <h2>📅 Holiday Pricing Analysis Comparison</h2>
+            <div class="chart-container">
+                <canvas id="holidayChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Route Analysis -->
+        <div class="card route-analysis">
+            <h2>🚀 Top High-Demand Routes Performance</h2>
+            <div class="chart-container">
+                <canvas id="routeChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Pricing Segments -->
+        <div class="card pricing-segments">
+            <h2>💰 Route Pricing Segments</h2>
+            <div class="chart-container">
+                <canvas id="segmentChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Demand Correlation -->
+        <div class="card demand-correlation">
+            <h2>📊 Day-of-Week Pricing Trends</h2>
+            <div class="chart-container">
+                <canvas id="dayChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Distance Efficiency -->
+        <div class="card distance-efficiency">
+            <h2>🎯 Distance-Based Pricing Efficiency</h2>
+            <div class="chart-container">
+                <canvas id="distanceChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Strategic Recommendations -->
+        <div class="card recommendations">
+            <h2>🎯 Strategic Business Recommendations</h2>
+            <div class="rec-grid">
+                <div class="rec-item">
+                    <h3>🚀 Revenue Optimization</h3>
+                    <p>Focus on <span class="highlight">MIA-OAK route</span> with premium pricing of $636.74 and potential revenue of <span class="highlight">$101.35M annually</span></p>
+                </div>
+                <div class="rec-item">
+                    <h3>⚠️ Capacity Management</h3>
+                    <p>Review <span class="highlight">DEN-JFK route</span> with low demand (2.86/10) and 7.1 average empty seats. Consider frequency reduction.</p>
+                </div>
+                <div class="rec-item">
+                    <h3>💡 Pricing Strategy</h3>
+                    <p>Optimize short-haul routes (<500 miles) showing <span class="highlight">$0.62 cost per mile</span> - 15-25% savings potential</p>
+                </div>
+                <div class="rec-item">
+                    <h3>📈 Dynamic Pricing</h3>
+                    <p>Implement AI-based pricing for high-correlation routes and surge pricing during <span class="highlight">peak demand periods</span></p>
+                </div>
+                <div class="rec-item">
+                    <h3>📅 Optimal Booking</h3>
+                    <p>Promote <span class="highlight">Tuesday flights booked 45 days ahead</span> for maximum savings of $104.34 (26%)</p>
+                </div>
+                <div class="rec-item">
+                    <h3>🌍 Market Expansion</h3>
+                    <p>Focus on <span class="highlight">2000-3000 mile routes</span> showing best efficiency at $0.17 per mile</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Chart configurations with light theme
+        Chart.defaults.font.family = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
+        Chart.defaults.color = '#2c3e50';
+        
+        // Holiday Comparison Chart
+        const holidayCtx = document.getElementById('holidayChart').getContext('2d');
+        new Chart(holidayCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Independence Day', 'Labor Day', 'Thanksgiving'],
+                datasets: [{
+                    label: 'Average Fare ($)',
+                    data: [385.72, 301.10, 341.45],
+                    backgroundColor: 'rgba(102, 126, 234, 0.7)',
+                    borderColor: 'rgba(102, 126, 234, 1)',
+                    borderWidth: 2,
+                    yAxisID: 'y'
+                }, {
+                    label: 'Price Volatility (%)',
+                    data: [12.31, 15.37, 11.90],
+                    backgroundColor: 'rgba(255, 154, 158, 0.7)',
+                    borderColor: 'rgba(255, 154, 158, 1)',
+                    borderWidth: 2,
+                    yAxisID: 'y1'
+                }, {
+                    label: 'Peak Price Increase (%)',
+                    data: [26.33, 33.09, 12.92],
+                    backgroundColor: 'rgba(168, 237, 234, 0.7)',
+                    borderColor: 'rgba(168, 237, 234, 1)',
+                    borderWidth: 2,
+                    yAxisID: 'y1'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Holiday Pricing Patterns & Volatility Analysis'
+                    }
+                },
+                scales: {
+                    y: {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        title: {
+                            display: true,
+                            text: 'Average Fare ($)'
+                        },
+                        grid: {
+                            color: 'rgba(0,0,0,0.1)'
+                        }
+                    },
+                    y1: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        title: {
+                            display: true,
+                            text: 'Percentage (%)'
+                        },
+                        grid: {
+                            drawOnChartArea: false,
+                        },
+                    }
+                }
+            }
+        });
+
+        // Top Routes Chart
+        const routeCtx = document.getElementById('routeChart').getContext('2d');
+        new Chart(routeCtx, {
+            type: 'scatter',
+            data: {
+                datasets: [{
+                    label: 'Route Performance',
+                    data: [
+                        {x: 6.09, y: 314.36, r: 15, route: 'LAX-OAK'},
+                        {x: 5.93, y: 240.17, r: 12, route: 'EWR-DTW'},
+                        {x: 5.56, y: 325.43, r: 13, route: 'OAK-LAX'},
+                        {x: 5.47, y: 489.77, r: 14, route: 'OAK-ORD'},
+                        {x: 5.44, y: 419.43, r: 18, route: 'OAK-DFW'},
+                        {x: 5.37, y: 230.10, r: 12, route: 'DTW-EWR'},
+                        {x: 5.37, y: 465.61, r: 11, route: 'ORD-OAK'},
+                        {x: 5.19, y: 551.56, r: 13, route: 'DTW-OAK'},
+                        {x: 5.16, y: 443.38, r: 17, route: 'DFW-OAK'},
+                        {x: 5.09, y: 300.37, r: 12, route: 'PHL-DTW'}
+                    ],
+                    backgroundColor: 'rgba(102, 126, 234, 0.6)',
+                    borderColor: 'rgba(102, 126, 234, 1)',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.raw.route}: Demand ${context.parsed.x}, Price $${context.parsed.y}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Demand Score (0-10)'
+                        },
+                        grid: {
+                            color: 'rgba(0,0,0,0.1)'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Average Price ($)'
+                        },
+                        grid: {
+                            color: 'rgba(0,0,0,0.1)'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Pricing Segments Chart
+        const segmentCtx = document.getElementById('segmentChart').getContext('2d');
+        new Chart(segmentCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Premium Routes (>$462)', 'Mid-tier Routes', 'Budget Routes (<$308)'],
+                datasets: [{
+                    data: [62, 88, 84],
+                    backgroundColor: [
+                        'rgba(255, 154, 158, 0.8)',
+                        'rgba(168, 237, 234, 0.8)',
+                        'rgba(102, 126, 234, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 154, 158, 1)',
+                        'rgba(168, 237, 234, 1)',
+                        'rgba(102, 126, 234, 1)'
+                    ],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                    }
+                }
+            }
+        });
+
+        // Day of Week Chart
+        const dayCtx = document.getElementById('dayChart').getContext('2d');
+        new Chart(dayCtx, {
+            type: 'line',
+            data: {
+                labels: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+                datasets: [{
+                    label: 'Average Price ($)',
+                    data: [401.38, 351.63, 297.04, 303.70, 346.98, 360.07, 336.61],
+                    backgroundColor: 'rgba(102, 126, 234, 0.2)',
+                    borderColor: 'rgba(102, 126, 234, 1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Average Price ($)'
+                        },
+                        grid: {
+                            color: 'rgba(0,0,0,0.1)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            color: 'rgba(0,0,0,0.1)'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Distance Efficiency Chart
+        const distanceCtx = document.getElementById('distanceChart').getContext('2d');
+        new Chart(distanceCtx, {
+            type: 'bar',
+            data: {
+                labels: ['0-500mi', '500-1000mi', '1000-1500mi', '1500-2000mi', '2000-2500mi', '2500-3000mi', '3000+mi'],
+                datasets: [{
+                    label: 'Price per Mile ($)',
+                    data: [0.6207, 0.3446, 0.2394, 0.2052, 0.1866, 0.1737, 0.1685],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.8)',
+                        'rgba(255, 99, 132, 0.6)',
+                        'rgba(255, 205, 86, 0.8)',
+                        'rgba(255, 205, 86, 0.6)',
+                        'rgba(75, 192, 192, 0.8)',
+                        'rgba(75, 192, 192, 0.6)',
+                        'rgba(75, 192, 192, 0.4)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(255, 205, 86, 1)',
+                        'rgba(255, 205, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(75, 192, 192, 1)'
+                    ],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Price per Mile ($)'
+                        },
+                        grid: {
+                            color: 'rgba(0,0,0,0.1)'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Distance Range'
+                        },
+                        grid: {
+                            color: 'rgba(0,0,0,0.1)'
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
