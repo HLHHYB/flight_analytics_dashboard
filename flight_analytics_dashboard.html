@@ -393,7 +393,7 @@
             surface: '#ffffff',
             background: '#f8fafc'
         };
-        
+
         // Holiday Comparison Chart
         const holidayCtx = document.getElementById('holidayChart').getContext('2d');
         new Chart(holidayCtx, {
@@ -401,10 +401,18 @@
             data: {
                 labels: ['Independence Day', 'Labor Day', 'Thanksgiving'],
                 datasets: [{
-                    label: 'Average Fare ($)',
+                    label: 'Average Total Fare ($)',
                     data: [385.72, 301.10, 341.45],
                     backgroundColor: 'rgba(59, 130, 246, 0.8)',
                     borderColor: vueColors.primary,
+                    borderWidth: 2,
+                    borderRadius: 8,
+                    yAxisID: 'y'
+                }, {
+                    label: 'Average Base Fare ($)',
+                    data: [334.29, 256.57, 293.16],
+                    backgroundColor: 'rgba(99, 102, 241, 0.8)',
+                    borderColor: '#6366f1',
                     borderWidth: 2,
                     borderRadius: 8,
                     yAxisID: 'y'
@@ -435,17 +443,47 @@
                         labels: {
                             usePointStyle: true,
                             pointStyle: 'circle',
-                            padding: 20
+                            padding: 20,
+                            font: {
+                                size: 12
+                            }
                         }
                     },
                     title: {
                         display: true,
-                        text: 'Holiday Pricing Patterns & Volatility Analysis',
+                        text: 'Holiday Pricing Patterns & Market Volatility Analysis',
                         font: {
                             size: 16,
                             weight: '600'
                         },
-                        color: vueColors.secondary
+                        color: vueColors.secondary,
+                        padding: {
+                            bottom: 20
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            afterBody: function(context) {
+                                if (context[0].datasetIndex < 2) {
+                                    const holiday = context[0].label;
+                                    let flightData = '';
+                                    if (holiday === 'Independence Day') {
+                                        flightData = 'Total Flight Records: 6.09M\nDemand-Price Correlation: -0.580 (Strong)';
+                                    } else if (holiday === 'Labor Day') {
+                                        flightData = 'Total Flight Records: 9.19M\nDemand-Price Correlation: -0.747 (Very Strong)';
+                                    } else if (holiday === 'Thanksgiving') {
+                                        flightData = 'Total Flight Records: 0.11M\nDemand-Price Correlation: -0.423 (Moderate)';
+                                    }
+                                    return flightData;
+                                }
+                                return '';
+                            }
+                        },
+                        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                        titleColor: vueColors.primary,
+                        bodyColor: vueColors.secondary,
+                        borderColor: vueColors.primary,
+                        borderWidth: 1
                     }
                 },
                 scales: {
@@ -456,15 +494,23 @@
                         title: {
                             display: true,
                             text: 'Average Fare ($)',
-                            color: vueColors.secondary
+                            color: vueColors.secondary,
+                            font: {
+                                weight: '600'
+                            }
                         },
                         grid: {
                             color: 'rgba(226, 232, 240, 0.8)',
                             lineWidth: 1
                         },
                         ticks: {
-                            color: vueColors.secondary
-                        }
+                            color: vueColors.secondary,
+                            callback: function(value) {
+                                return '$' + value;
+                            }
+                        },
+                        beginAtZero: true,
+                        max: 450
                     },
                     y1: {
                         type: 'linear',
@@ -473,21 +519,32 @@
                         title: {
                             display: true,
                             text: 'Percentage (%)',
-                            color: vueColors.secondary
+                            color: vueColors.secondary,
+                            font: {
+                                weight: '600'
+                            }
                         },
                         grid: {
                             drawOnChartArea: false,
                         },
                         ticks: {
-                            color: vueColors.secondary
-                        }
+                            color: vueColors.secondary,
+                            callback: function(value) {
+                                return value + '%';
+                            }
+                        },
+                        beginAtZero: true,
+                        max: 40
                     },
                     x: {
                         grid: {
                             color: 'rgba(226, 232, 240, 0.5)'
                         },
                         ticks: {
-                            color: vueColors.secondary
+                            color: vueColors.secondary,
+                            font: {
+                                weight: '500'
+                            }
                         }
                     }
                 }
